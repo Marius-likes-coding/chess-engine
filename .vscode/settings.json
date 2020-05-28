@@ -1,0 +1,7 @@
+{
+  "python.pythonPath": "/home/sideproject/dev/chess-bot/envir/bin/python3",
+  "python.linting.pylintEnabled": true,
+  "python.linting.enabled": true,
+  "python.formatting.provider": "black",
+  "python.linting.banditEnabled": false
+}
