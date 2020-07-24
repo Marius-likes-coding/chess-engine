@@ -1,0 +1,10 @@
+README.md
+setup.py
+chess-bot/__init__.py
+chess-bot/pool.py
+chess-bot/config/__init__.py
+chess-bot/config/settings.py
+chess_bot.egg-info/PKG-INFO
+chess_bot.egg-info/SOURCES.txt
+chess_bot.egg-info/dependency_links.txt
+chess_bot.egg-info/top_level.txt

@@ -1,174 +1,110 @@
-import requests
 import json
 import multiprocessing
 import random
+import backoff
+import requests
+import time
 
 from urllib.parse import urljoin
 from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
 from urllib3.exceptions import ProtocolError
 from http.client import RemoteDisconnected
+from bs4 import BeautifulSoup
+from random import shuffle
 
-from config.settings import token, url
-
-class LichessConnector():
-
-    def __init__(self, token):
-        self.header = {'Authorization': f'Bearer {token}'}
-        self.baseUrl = "https://lichess.org"
-        self.session = requests.Session()
-        self.session.headers.update(self.header)
-
-    @backoff.on_exception(backoff.constant, 
-        (RemoteDisconnected, ConnectionError, ProtocolError, HTTPError, ReadTimeout), max_time=60, interval=0.1, giveup=is_final)
-    def get(self, path, stream=False):
-        response = self.session.get(f"{self.baseUrl}{path}", timeout=2, stream=stream)
-        response.raise_for_status()
-        return response
-
-    @backoff.on_exception(backoff.constant, 
-        (RemoteDisconnected, ConnectionError, ProtocolError, HTTPError, ReadTimeout), max_time=60, interval=0.1, giveup=is_final)
-    def post(self, path, data=None):
-        response = self.session.post(f"{self.baseUrl}{path}", data=data, timeout=2)
-        response.raise_for_status()
-        return response
-    
-    # Events
-
-    def stream_events(self):
-        return self.get(f"/api/stream/event", stream=True)
-    
-    # Challenges
-
-    def accept_challenge(self, challenge_id):
-        return self.post(f"/api/challenge/{challenge_id}/accept").json()
-
-    def decline_challenge(self, challenge_id):
-        return self.post(f"/api/challenge/{challenge_id}/decline").json()
-    
-    # Games
-
-    def stream_game(self, game_id):
-        return self.get(f"/api/bot/game/stream/{game_id}", stream=True)
-
-    def make_move(self, game_id, move):
-        return self.post(f"/api/bot/game/{game_id}/move/{move}").json()
-
-    def abort(self, game_id):
-        return self.post(f"/api/bot/game/{game_id}/abort").json()
-
-    def resign(self, game_id):
-        return self.post(f"/api/bot/game/{game_id}/resign").json()
+from lichess import LichessConnector
+from config.settings import token
+from pool import LoggingPool
 
 
+def watch_event_stream(lc_connector, event_queue):
+    response = lc_connector.stream_events()
+    print(response.status_code)
+    print(response.url)
 
-def stream_events(event_queue):
-	response = requests.get(url + 'api/stream/event', headers=headers, stream=True)
-	
-	for event in response.iter_lines():
-		if event:
-			event_queue.put_nowait(json.loads(event.decode('utf-8')))
-		else:
-			event_queue.put_nowait({'type': 'ping'})
+    for event in response.iter_lines():
+        if event:
+            event_queue.put_nowait(json.loads(event.decode("utf-8")))
+        else:
+            event_queue.put_nowait({"type": "ping"})
 
-def play_game(game_id, event_queue):
-	start_color = 1
-	my_time = 'btime'
-	game_stream = game_updates(game_id).iter_lines()
 
-	print('GAME_STREAM')
-	print(game_stream)
+def scrape_online_bots():
+    response = requests.get("https://lichess.org/player/bots")
+    soupPage = BeautifulSoup(response.content, "html.parser")
 
-	game = json.loads(next(game_stream).decode('utf-8'))
-	variant = game['variant']['key']
+    bot_names = []
+    for a in soupPage.find_all("a", {"class": "online user-link ulpt"}):
+        bot_names.append(a["href"][3:])
+    return bot_names
 
-	in_book = True
-	current_book = None
 
-	if variant == 'atomic':
-		board = chess.variant.AtomicBoard()
-	if variant == 'antichess':
-		board = chess.variant.GiveawayBoard()
-	if variant == 'standard':
-		current_book = standard_book
-		print("Choosing book standard_book")
-		board = chess.Board()
+def create_challenge(lc_connector, user_name):
+    response = lc_connector.create_challenge(
+        user_name, rated=True, clock_limit=300, clock_increment=0
+    )
+    print(f"[print] Challenged {user_name}: {response.status_code}")
 
-	fens = []
 
-	if game['white']['id'] == BOT_ID:
-		start_color = -1
-		my_time = 'wtime'
+def challenge_online_bots(lc_connector):
+    bot_names = scrape_online_bots()
+    shuffle(bot_names)
+    print(f"[print] {len(bot_names)} bots online")
+    for bot_name in bot_names:
+        create_challenge(lc_connector, bot_name)
+        time.sleep(60)
 
-		if variant == 'atomic':
-			print("Choosing book atomic_white")
-			current_book = atomic_white
 
-		#bot_move = search(board, color=-start_color, variant=variant, depth=3)
+def play_game(lc_connector, game_id):
+    print("[print] game started !")
+    multiprocessing.get_logger().debug("[print] game started !")
 
-		if current_book:
-			book_move = current_book.get_moves([])
-		if variant == 'antichess':
-			bot_move = random.choice(['e2e3', 'b2b3', 'g2g3'])
-		else:
-			bot_move = random.choice(book_move)
+    game_stream = lc_connector.stream_game(game_id).iter_lines()
+    try:
 
-		make_move(game_id, bot_move)
-		fens.append(board.fen()[:-9].strip())
-	elif game['black']['id'] == BOT_ID and variant == 'atomic':
-		print("Choosing book atomic_black")
-		current_book = atomic_black
+        play(lc_connector, game_id, game_stream)
+        lc_connector.abort(game_id)
+        print("[print] game aborted !")
+    except Exception as e:
+        print("E:", e)
 
-	for event in game_stream:
-		upd = json.loads(event.decode('utf-8')) if event else None
-		_type = upd['type'] if upd else 'ping'
-		if (_type == 'gameState'):
-			last_move = upd['moves'].split(' ')[-1]
-			last_move = chess.Move.from_uci(last_move)
-			board.push(last_move)
 
-			moves = upd['moves'].split(' ')
+if __name__ == "__main__":
+    print("Starting ...")
+    lc_connector = LichessConnector(token)
+    event_queue = multiprocessing.Manager().Queue()
 
-			if (in_book and current_book):
-				book_move = current_book.get_moves(moves)
-			else:
-				book_move = None
+    print("spawning event stream watch ...")
+    control_stream = multiprocessing.Process(
+        target=watch_event_stream, args=[lc_connector, event_queue]
+    )
+    control_stream.start()
+    multiprocessing.get_logger().debug("[logger] event stream watch spawned !")
+    print("event stream watch spawned !")
 
-			if in_book and not book_move:
-				print(in_book)
-				chat(game_id, "I'm out of book! :O")
-				print("Out of book!")
-				in_book = False
+    challenge_online_bots(lc_connector)
 
-			if book_move:
-				print("Book moves:")
-				print(book_move)
-				bot_move = random.choice(book_move)
-				bot_move = chess.Move.from_uci(bot_move)
-			else:
-				bot_move = search(board, color=-start_color, variant=variant, depth=time_to_depth(upd[my_time], variant))
+    with LoggingPool(10) as pool:
+        while True:
+            event = event_queue.get()
 
-			print(bot_move)
+            if (
+                event["type"] == "challenge"
+                and event["challenge"]["variant"]["key"] == "standard"
+            ):
+                challenge_id = event["challenge"]["id"].strip()
+                print("[print] accepting challenge ...")
+                lc_connector.accept_challenge(challenge_id)
+                print("[print] challenge accepted !")
 
-			make_move(game_id, bot_move)
-			fens.append(board.fen()[:-9].strip())
+            elif event["type"] == "gameStart":
+                game_id = event["game"]["id"]
+                print(f"[print] starting game {game_id} ...")
+                pool.apply_async(play_game, [lc_connector, game_id])
 
-if __name__ == '__main__':
-	event_queue = multiprocessing.Manager().Queue()
+            else:
+                print(f"[print] Event: {event}")
 
-	control_stream = multiprocessing.Process(target=stream_events, args=[event_queue])
-	control_stream.start()
+    control_stream.terminate()
+    control_stream.join()
 
-	with logging_pool.LoggingPool(10) as pool:
-		while True:
-			event = event_queue.get()
-
-			if event['type'] == 'challenge' and ((event['challenge']['variant']['key'] == 'standard') or (event['challenge']['variant']['key'] == 'atomic') or (event['challenge']['variant']['key'] == 'antichess')):
-				_id = event['challenge']['id'].strip()
-
-				accept_challenge(_id)
-			elif event['type'] == 'gameStart':
-				game_id = event['game']['id']
-				pool.apply_async(play_game, [game_id, event_queue])
-
-	control_stream.terminate()
-	control_stream.join()
