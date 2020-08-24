@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 from random import shuffle
 
 from lichess import LichessConnector
+from engines.trivial import play
 from config.settings import token
 from pool import LoggingPool
 
@@ -61,10 +62,7 @@ def play_game(lc_connector, game_id):
 
     game_stream = lc_connector.stream_game(game_id).iter_lines()
     try:
-
         play(lc_connector, game_id, game_stream)
-        lc_connector.abort(game_id)
-        print("[print] game aborted !")
     except Exception as e:
         print("E:", e)
 
@@ -82,7 +80,7 @@ if __name__ == "__main__":
     multiprocessing.get_logger().debug("[logger] event stream watch spawned !")
     print("event stream watch spawned !")
 
-    challenge_online_bots(lc_connector)
+    # challenge_online_bots(lc_connector)
 
     with LoggingPool(10) as pool:
         while True:

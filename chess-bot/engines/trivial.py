@@ -1,4 +1,5 @@
 import json
+import random
 import chess
 
 BOT_USERNAME = "Chestor2008"
@@ -19,31 +20,37 @@ def decode_event(event):
 #     return UNICODE_PIECE_SYMBOLS[piece_type][color]
 
 UNICODE_PIECE_SYMBOLS = {
-    "r": {"white": "♜", "black": "♖"},
-    "n": {"white": "♞", "black": "♘"},
-    "b": {"white": "♝", "black": "♗"},
-    "b": {"white": "♛", "black": "♕"},
-    "k": {"white": "♚", "black": "♔"},
-    "p": {"white": "♟", "black": "♙"},
+    "♜": "black",
+    "♞": "black",
+    "♝": "black",
+    "♛": "black",
+    "♚": "black",
+    "♟": "black",
+    "♖": "white",
+    "♘": "white",
+    "♗": "white",
+    "♕": "white",
+    "♔": "white",
+    "♙": "white",
 }
 
 
-def move_to_unicode(move, game_data):
+def move_to_unicode(move, raw_move, game_data):
     board = game_data.board
 
     source_piece = board.piece_at(move.from_square)
     destin_piece = board.piece_at(move.to_square)
 
-    source_color = color_name(source_piece.color)
-    destin_color = color_name(destin_piece.color) if destin_piece else None
+    # source_color = color_name(source_piece.color) if source_piece else None
+    # destin_color = color_name(destin_piece.color) if destin_piece else None
 
-    s_piece_uni = UNICODE_PIECE_SYMBOLS[chess.piece_symbol(source_piece)][source_color]
-    d_piece_uni = (
-        UNICODE_PIECE_SYMBOLS[chess.piece_symbol(destin_piece)][destin_color]
-        if destin_piece
-        else "empty field"
+    s_piece_uni = source_piece.unicode_symbol() if source_piece else "empty field"
+    d_piece_uni = destin_piece.unicode_symbol() if destin_piece else "empty field"
+
+    return (
+        f"{raw_move[:2]} ({s_piece_uni})  → {raw_move[2:]} ({d_piece_uni})",
+        s_piece_uni,
     )
-    return f"{move[:2]} ({s_piece_uni})  → {move[2:]} ({d_piece_uni})"
 
 
 def color_name(color):
@@ -61,6 +68,14 @@ class GameData:
         self._move_history = []
 
     @property
+    def board(self):
+        return self._board
+
+    @property
+    def game_id(self):
+        return self._game_id
+
+    @property
     def move_history(self):
         return self._move_history
 
@@ -73,34 +88,66 @@ class GameData:
         self._color = value
 
     def opponent_color(self):
-        return color_name(not self._color)
+        return not self._color
+
+
+def parse_and_save_move(game_data, raw_move):
+    move = chess.Move.from_uci(raw_move)
+    game_data.board.push(move)
+    game_data.move_history.append(raw_move)
+    return move
 
 
 def update_game_data(game_data, event):
-    moves = event["moves"]
-    if len(moves) == len(game_data.move_history) + 1:
-        raw_last_move = moves.split(" ")[-1]
-        last_move = chess.Move.from_uci(raw_last_move)
+    moves = event["moves"].split(" ")
 
-        game_data.board.push(last_move)
-        game_data.move_history.append(raw_last_move)
+    local_nbr_moves = len(game_data.move_history)
+    remote_nbr_moves = len(moves)
 
-        move_string = move_to_unicode(raw_last_move, game_data)
-
-        print(f"{game_data.opponent_color()} moved: {move_string}")
-
-    else:
+    if len(moves) > len(game_data.move_history) + 1:
         print(
-            f"Weird: nbr moves locally: {len(game_data.move_history)}, nbr moves remotely: {len(moves)}"
+            f"Catching up on moves: nbr moves locally: {local_nbr_moves}, nbr moves remotely: {remote_nbr_moves} -> remote moves: {moves}"
         )
 
+    moves_to_catch_up = remote_nbr_moves - local_nbr_moves
 
-def make_move(move):
-    return 0
+    if moves_to_catch_up > 0:
+        for raw_move in moves[
+            remote_nbr_moves - moves_to_catch_up : remote_nbr_moves - 1
+        ]:
+            parse_and_save_move(game_data, raw_move)
+
+        move = chess.Move.from_uci(moves[-1])
+        move_string, source_piece_uni = move_to_unicode(move, moves[-1], game_data)
+
+        game_data.board.push(move)
+        game_data.move_history.append(moves[-1])
+
+        # announce last move
+        color_last_move = UNICODE_PIECE_SYMBOLS[source_piece_uni]
+        print(f"{color_last_move} moved: {move_string}")
+
+
+def check_if_my_turn(game_data):
+    if len(game_data.move_history) % 2 == 0:
+        # white's turn
+        if game_data.color == chess.WHITE:
+            return True
+    else:
+        # black's turn
+        if game_data.color == chess.BLACK:
+            return True
+
+    return False
+
+
+def make_move(lc_connector, game_data, move):
+    lc_connector.make_move(game_data.game_id, move.uci())
 
 
 def calculate_next_move(game_data):
-    return 0
+    random_move = next(iter(game_data.board.legal_moves))
+    return random_move
 
 
 def play(lc_connector, game_id, game_stream):
@@ -114,23 +161,36 @@ def play(lc_connector, game_id, game_stream):
 
             if event_type == "gameFull":
 
-                if event[color_name(chess.WHITE)]["id"] == BOT_USERNAME:
+                status = event["state"]["status"]
+                if status != "started":
+                    print(f"Status: {status}")
+
+                if event[color_name(chess.WHITE)]["name"] == BOT_USERNAME:
                     print(f"Playing as white!")
                     game_data.color = chess.WHITE
-                    move = calculate_next_move(game_data)
-                    make_move(move)
 
-                elif event[color_name(chess.BLACK)]["id"] == BOT_USERNAME:
+                elif event[color_name(chess.BLACK)]["name"] == BOT_USERNAME:
                     print(f"Playing as black!")
                     game_data.color = chess.BLACK
 
                 else:
                     print(f"I don't play in this game ? {event}")
 
+                update_game_data(game_data, event["state"])
+                is_my_turn = check_if_my_turn(game_data)
+                if is_my_turn:
+                    move = calculate_next_move(game_data)
+                    make_move(lc_connector, game_data, move)
+
             elif event_type == "gameState":
+                status = event["status"]
+                if status != "started":
+                    print(f"Status: {status}")
                 update_game_data(game_data, event)
-                move = calculate_next_move(game_data)
-                make_move(move)
+                is_my_turn = check_if_my_turn(game_data)
+                if is_my_turn:
+                    move = calculate_next_move(game_data)
+                    make_move(lc_connector, game_data, move)
 
             elif event_type == "chatLine":
                 print(f"Chat message: {event['username']} >  {event['text']}")
@@ -139,4 +199,4 @@ def play(lc_connector, game_id, game_stream):
                 print()
 
         else:
-            print(f"[print] ping event: {event}")
+            print(f"[print] ping event: {raw_event}")
