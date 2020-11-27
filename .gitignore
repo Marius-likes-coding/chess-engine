@@ -1,1 +1,10 @@
 envir/
+.vscode/
+build/
+dist/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info
+.installed.cfg
+*.egg

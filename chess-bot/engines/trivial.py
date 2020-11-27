@@ -1,6 +1,11 @@
 import json
 import random
 import chess
+import time
+
+from .minmax import min_max_first_iteration
+from .minmax_a_b_proning import a_b_min_max_first_iteration
+from .game_data import GameData
 
 BOT_USERNAME = "Chestor2008"
 
@@ -60,37 +65,6 @@ def color_name(color):
         return "black"
 
 
-class GameData:
-    def __init__(self, game_id):
-        self._game_id = game_id
-        self._color = None
-        self._board = chess.Board()
-        self._move_history = []
-
-    @property
-    def board(self):
-        return self._board
-
-    @property
-    def game_id(self):
-        return self._game_id
-
-    @property
-    def move_history(self):
-        return self._move_history
-
-    @property
-    def color(self):
-        return self._color
-
-    @color.setter
-    def color(self, value):
-        self._color = value
-
-    def opponent_color(self):
-        return not self._color
-
-
 def parse_and_save_move(game_data, raw_move):
     move = chess.Move.from_uci(raw_move)
     game_data.board.push(move)
@@ -111,7 +85,7 @@ def update_game_data(game_data, event):
 
     moves_to_catch_up = remote_nbr_moves - local_nbr_moves
 
-    if moves_to_catch_up > 0:
+    if moves_to_catch_up > 0 and moves[0] != "":
         for raw_move in moves[
             remote_nbr_moves - moves_to_catch_up : remote_nbr_moves - 1
         ]:
@@ -146,8 +120,11 @@ def make_move(lc_connector, game_data, move):
 
 
 def calculate_next_move(game_data):
-    random_move = next(iter(game_data.board.legal_moves))
-    return random_move
+    # random_move = next(iter(game_data.board.legal_moves))
+    start_time = time.time()
+    best_move = a_b_min_max_first_iteration(game_data, 4, True)
+    print("Move calculation time: %s seconds " % (time.time() - start_time))
+    return best_move
 
 
 def play(lc_connector, game_id, game_stream):
@@ -186,6 +163,7 @@ def play(lc_connector, game_id, game_stream):
                 status = event["status"]
                 if status != "started":
                     print(f"Status: {status}")
+                    continue
                 update_game_data(game_data, event)
                 is_my_turn = check_if_my_turn(game_data)
                 if is_my_turn:
@@ -198,5 +176,6 @@ def play(lc_connector, game_id, game_stream):
             else:
                 print()
 
-        else:
-            print(f"[print] ping event: {raw_event}")
+        # else:
+        # print(f"[print] ping event: {raw_event}")
+

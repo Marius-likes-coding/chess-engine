@@ -4,6 +4,7 @@ import random
 import backoff
 import requests
 import time
+import traceback
 
 from urllib.parse import urljoin
 from requests.exceptions import ConnectionError, HTTPError, ReadTimeout
@@ -65,6 +66,8 @@ def play_game(lc_connector, game_id):
         play(lc_connector, game_id, game_stream)
     except Exception as e:
         print("E:", e)
+        print(traceback.print_exc())
+        print(traceback.format_exc())
 
 
 if __name__ == "__main__":
@@ -100,8 +103,8 @@ if __name__ == "__main__":
                 print(f"[print] starting game {game_id} ...")
                 pool.apply_async(play_game, [lc_connector, game_id])
 
-            else:
-                print(f"[print] Event: {event}")
+            # else:
+            # print(f"[print] Event: {event}")
 
     control_stream.terminate()
     control_stream.join()
