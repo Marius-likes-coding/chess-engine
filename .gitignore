@@ -3,6 +3,8 @@ envir/
 build/
 dist/
 __pycache__/
+chess-bot/config/settings.py
+
 *.py[cod]
 *$py.class
 *.egg-info
