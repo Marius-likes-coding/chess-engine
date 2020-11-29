@@ -15,7 +15,7 @@ from random import shuffle
 
 from lichess import LichessConnector
 from engines.trivial import play
-from config.settings import token
+from config.settings import token, bot_username
 from pool import LoggingPool
 
 
@@ -92,6 +92,8 @@ if __name__ == "__main__":
             if (
                 event["type"] == "challenge"
                 and event["challenge"]["variant"]["key"] == "standard"
+                and event["challenge"]["challenger"]["name"] != bot_username
+                and event["challenge"]["timeControl"]["limit"] >= 600
             ):
                 challenge_id = event["challenge"]["id"].strip()
                 print("[print] accepting challenge ...")
@@ -101,6 +103,7 @@ if __name__ == "__main__":
             elif event["type"] == "gameStart":
                 game_id = event["game"]["id"]
                 print(f"[print] starting game {game_id} ...")
+                print(f"Link: https://lichess.org/{game_id}")
                 pool.apply_async(play_game, [lc_connector, game_id])
 
             # else:
@@ -108,4 +111,3 @@ if __name__ == "__main__":
 
     control_stream.terminate()
     control_stream.join()
-

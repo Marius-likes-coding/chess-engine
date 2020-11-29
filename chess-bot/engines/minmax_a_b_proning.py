@@ -59,17 +59,15 @@ def min_max(game_data, depth, alpha, beta, is_maximizing_player):
         return value
 
 
-# fen = "r1b1kb1r/pp1n1ppp/2pq1n2/3p2N1/4p3/3N4/PPPPPPPP/R1BQKB1R w KQkq - 0 9"
+# fen = "r2qr1k1/1pp2p2/3p3Q/p3p1N1/8/P2Rn1B1/5PPP/5RK1 b - - 0 25"
 
 
 # def print_score_of_fen(fen):
 #     game_data = GameData(1)
 #     game_data.board = chess.Board(fen)
-#     game_data.color = chess.WHITE
-#     move3 = min_max_first_iteration(game_data, 3, True)
-#     print(f"move3: {move3}")
-#     move4 = min_max_first_iteration(game_data, 4, True)
-#     print(f"move4: {move4}")
+#     game_data.color = chess.BLACK
+#     move3 = a_b_min_max_first_iteration(game_data, 5, True)
+#     print(move3.uci())
 
 
 # print_score_of_fen(fen)

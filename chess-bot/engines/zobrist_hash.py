@@ -1,38 +1,186 @@
 import chess
 
-from poly_random_array import POLYGLOT_RANDOM_ARRAY
-from pieces import PIECES
+from .poly_random_array import POLYGLOT_RANDOM_ARRAY
+from .pieces import PIECES
 
-SIZE = 781 # 64 * 12 = 768 + 13 (4 + )
+SIZE = 781  # 64 * 12 = 768 + 13 (4 + 8 + 1)
 NBR_PIECES = 12
 
-def get_all_square_piece_tuples(board):
+
+# def get_all_square_pieces_of_color(board, color):
+#     return chess.SquareSet(
+#         (
+#             board.pawns
+#             | board.knights
+#             | board.bishops
+#             | board.rooks
+#             | board.queens
+#             | board.kings
+#         )
+#         & board.occupied_co[color]
+#     )
+
+
+def get_piece_index(piece, color, square):
+    # print(f"piece {piece}, color {color}, square {square}")
+    piece_index = (2 - color) * (piece - 1)
+    return (64 * piece_index) + square
+
+
+def get_all_piece_indexes(board):
     square_piece_tuples = []
-    
-    for i, piece in enumerate(PIECES):
-        
+
+    for piece in range(1, 7):
+
         pieces_white = board.pieces(piece, chess.WHITE)
-        square_piece_tuples.extend([((2 - chess.WHITE)*i, pw) for pw in pieces_white])
-        
+        for white_square in pieces_white:
+            square_piece_tuples.append(
+                get_piece_index(piece, chess.WHITE, white_square)
+            )
+
         pieces_black = board.pieces(piece, chess.BLACK)
-        square_piece_tuples.extend([((2 - chess.BLACK)*i, pb) for pb in pieces_black])
-        
+        for black_square in pieces_black:
+            square_piece_tuples.append(
+                get_piece_index(piece, chess.BLACK, black_square)
+            )
+
     return square_piece_tuples
+
 
 class ZobristHash:
     def __init__(self):
-        self.random_values = POLYGLOT_RANDOM_ARRAY
-        
+        self.zobrist_hash = 0
+        self.current_special_flags = 0
+
+    def h(self):
+        return self.zobrist_hash
 
     def from_board(self, board):
         self.zobrist_hash = 0
 
-        for (piece_index, square) in get_all_square_piece_tuples(board):
-            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[(64 * piece_index) + square]
-        
+        # Hash in the pieces [0 ... 767].
+        for piece_index in get_all_piece_indexes(board):
+            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[piece_index]
+
+        self.apply_special_flags(board)
+
         return self.zobrist_hash
-            
-    def to_board(self):
-        return None
-    
-    def make_move(self, move):
+
+    def apply_special_flags(self, board):
+        self.current_special_flags = 0
+
+        # Hash in the castling flags [768 ... 771].
+        if board.has_kingside_castling_rights(chess.WHITE):
+            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[768]
+            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[768]
+        if board.has_queenside_castling_rights(chess.WHITE):
+            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[769]
+            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[769]
+        if board.has_kingside_castling_rights(chess.BLACK):
+            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[770]
+            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[770]
+        if board.has_queenside_castling_rights(chess.BLACK):
+            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[771]
+            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[771]
+
+        # Hash in the en passant file [772 ... 779].
+        if board.ep_square:
+            # But only if there's actually a pawn ready to capture it. Legality
+            # of the potential capture is irrelevant.
+            if board.turn == chess.WHITE:
+                ep_mask = chess.shift_down(chess.BB_SQUARES[board.ep_square])
+            else:
+                ep_mask = chess.shift_up(chess.BB_SQUARES[board.ep_square])
+
+            ep_mask = chess.shift_left(ep_mask) | chess.shift_right(ep_mask)
+
+            if ep_mask & board.pawns & board.occupied_co[board.turn]:
+                rand = POLYGLOT_RANDOM_ARRAY[772 + chess.square_file(board.ep_square)]
+                self.zobrist_hash ^= rand
+                self.current_special_flags ^= rand
+
+        # Hash in turn [780]
+        if board.turn == chess.WHITE:
+            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[780]
+            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[780]
+
+    def remove_special_flags(self):
+        self.zobrist_hash ^= self.current_special_flags
+        self.current_special_flags = 0
+
+    def make_move(self, board, move):
+        # Hash out the special flags
+        self.remove_special_flags()
+
+        from_piece = (
+            chess.PAWN
+            if move.promotion is not None
+            else board.piece_type_at(move.to_square)
+        )
+        from_color = board.color_at(move.to_square)
+        from_index = get_piece_index(from_piece, from_color, move.from_square)
+
+        # Hash out the piece at its FROM square
+        self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[from_index]
+
+        # If a piece was dropped, hash it out of the TO square
+        if move.drop is not None:
+            drop_piece = move.drop
+            drop_color = not from_color
+            drop_index = get_piece_index(drop_piece, drop_color, move.to_square)
+
+            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[drop_index]
+
+        # if a promotion occurs the piece type changes:
+        to_piece = board.piece_type_at(move.to_square)
+        to_index = get_piece_index(to_piece, from_color, move.to_square)
+
+        # Hash in the piece at its TO square
+        self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[to_index]
+
+        # Hash in the special flags
+        self.apply_special_flags(board)
+        return self.zobrist_hash
+
+    def undo_move(self, board, move):
+        # Hash out the special flags
+        self.remove_special_flags()
+
+        to_piece = (
+            move.promotion
+            if move.promotion is not None
+            else board.piece_type_at(move.from_square)
+        )
+        to_color = board.color_at(move.from_square)
+        # print(f"to_piece: {to_piece}")
+        # print(f"to_color: {to_color}")
+        # print(f"to_square: {move.to_square}")
+        to_index = get_piece_index(to_piece, to_color, move.to_square)
+
+        # Hash out the piece at its TO square
+        self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[to_index]
+
+        # if a promotion occurs the piece type changes:
+        from_piece = board.piece_type_at(move.from_square)
+        # print(f"from_piece: {from_piece}")
+        # print(f"from_color: {to_color}")
+        # print(f"from_square: {move.from_square}")
+        from_index = get_piece_index(from_piece, to_color, move.from_square)
+
+        # Hash in the piece at its FROM square
+        self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[from_index]
+
+        # If a piece was dropped, hash it in the TO square
+        if move.drop is not None:
+            drop_piece = move.drop
+            drop_color = not to_color
+            # print(f"drop_piece: {drop_piece}")
+            # print(f"drop_color: {drop_color}")
+            # print(f"drop_square: {move.to_square}")
+            drop_index = get_piece_index(drop_piece, drop_color, move.to_square)
+
+            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[drop_index]
+
+        # Hash in the special flags
+        self.apply_special_flags(board)
+        return self.zobrist_hash

@@ -5,6 +5,7 @@ import time
 
 from .minmax import min_max_first_iteration
 from .minmax_a_b_proning import a_b_min_max_first_iteration
+from .minmax_ab_tt import search_move
 from .game_data import GameData
 
 BOT_USERNAME = "Chestor2008"
@@ -120,9 +121,11 @@ def make_move(lc_connector, game_data, move):
 
 
 def calculate_next_move(game_data):
-    # random_move = next(iter(game_data.board.legal_moves))
     start_time = time.time()
+    # random_move = next(iter(game_data.board.legal_moves))
+    # best_move = search_move(game_data)
     best_move = a_b_min_max_first_iteration(game_data, 4, True)
+    print(best_move.uci())
     print("Move calculation time: %s seconds " % (time.time() - start_time))
     return best_move
 
@@ -141,12 +144,12 @@ def play(lc_connector, game_id, game_stream):
                 status = event["state"]["status"]
                 if status != "started":
                     print(f"Status: {status}")
-
-                if event[color_name(chess.WHITE)]["name"] == BOT_USERNAME:
+                print(event)
+                if event[color_name(chess.WHITE)].get("name") == BOT_USERNAME:
                     print(f"Playing as white!")
                     game_data.color = chess.WHITE
 
-                elif event[color_name(chess.BLACK)]["name"] == BOT_USERNAME:
+                elif event[color_name(chess.BLACK)].get("name") == BOT_USERNAME:
                     print(f"Playing as black!")
                     game_data.color = chess.BLACK
 
@@ -178,4 +181,3 @@ def play(lc_connector, game_id, game_stream):
 
         # else:
         # print(f"[print] ping event: {raw_event}")
-

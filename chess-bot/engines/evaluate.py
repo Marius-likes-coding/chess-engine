@@ -17,58 +17,418 @@ PAWN_O = [
 ]
 
 KNIGHT_O = [
-    [-50, -40, -30, -30, -30, -30, -40, -50,],
-    [-40, -20, 0, 0, 0, 0, -20, -40,],
-    [-30, 0, 10, 15, 15, 10, 0, -30,],
-    [-30, 5, 15, 20, 20, 15, 5, -30,],
-    [-30, 0, 15, 20, 20, 15, 0, -30,],
-    [-30, 5, 10, 15, 15, 10, 5, -30,],
-    [-40, -20, 0, 5, 5, 0, -20, -40,],
-    [-50, -40, -30, -30, -30, -30, -40, -50,],
+    [
+        -50,
+        -40,
+        -30,
+        -30,
+        -30,
+        -30,
+        -40,
+        -50,
+    ],
+    [
+        -40,
+        -20,
+        0,
+        0,
+        0,
+        0,
+        -20,
+        -40,
+    ],
+    [
+        -30,
+        0,
+        10,
+        15,
+        15,
+        10,
+        0,
+        -30,
+    ],
+    [
+        -30,
+        5,
+        15,
+        20,
+        20,
+        15,
+        5,
+        -30,
+    ],
+    [
+        -30,
+        0,
+        15,
+        20,
+        20,
+        15,
+        0,
+        -30,
+    ],
+    [
+        -30,
+        5,
+        10,
+        15,
+        15,
+        10,
+        5,
+        -30,
+    ],
+    [
+        -40,
+        -20,
+        0,
+        5,
+        5,
+        0,
+        -20,
+        -40,
+    ],
+    [
+        -50,
+        -40,
+        -30,
+        -30,
+        -30,
+        -30,
+        -40,
+        -50,
+    ],
 ]
 
 BISHOP_O = [
-    [-20, -10, -10, -10, -10, -10, -10, -20,],
-    [-10, 0, 0, 0, 0, 0, 0, -10,],
-    [-10, 0, 5, 10, 10, 5, 0, -10,],
-    [-10, 5, 5, 10, 10, 5, 5, -10,],
-    [-10, 0, 10, 10, 10, 10, 0, -10,],
-    [-10, 10, 10, 10, 10, 10, 10, -10,],
-    [-10, 5, 0, 0, 0, 0, 5, -10,],
-    [-20, -10, -10, -10, -10, -10, -10, -20,],
+    [
+        -20,
+        -10,
+        -10,
+        -10,
+        -10,
+        -10,
+        -10,
+        -20,
+    ],
+    [
+        -10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -10,
+    ],
+    [
+        -10,
+        0,
+        5,
+        10,
+        10,
+        5,
+        0,
+        -10,
+    ],
+    [
+        -10,
+        5,
+        5,
+        10,
+        10,
+        5,
+        5,
+        -10,
+    ],
+    [
+        -10,
+        0,
+        10,
+        10,
+        10,
+        10,
+        0,
+        -10,
+    ],
+    [
+        -10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        -10,
+    ],
+    [
+        -10,
+        5,
+        0,
+        0,
+        0,
+        0,
+        5,
+        -10,
+    ],
+    [
+        -20,
+        -10,
+        -10,
+        -10,
+        -10,
+        -10,
+        -10,
+        -20,
+    ],
 ]
 
 ROOK_O = [
-    [0, 0, 0, 0, 0, 0, 0, 0,],
-    [5, 10, 10, 10, 10, 10, 10, 5,],
-    [-5, 0, 0, 0, 0, 0, 0, -5,],
-    [-5, 0, 0, 0, 0, 0, 0, -5,],
-    [-5, 0, 0, 0, 0, 0, 0, -5,],
-    [-5, 0, 0, 0, 0, 0, 0, -5,],
-    [-5, 0, 0, 0, 0, 0, 0, -5,],
-    [0, 0, 0, 5, 5, 0, 0, 0,],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        5,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        5,
+    ],
+    [
+        -5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -5,
+    ],
+    [
+        -5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -5,
+    ],
+    [
+        -5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -5,
+    ],
+    [
+        -5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -5,
+    ],
+    [
+        -5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -5,
+    ],
+    [
+        0,
+        0,
+        0,
+        5,
+        5,
+        0,
+        0,
+        0,
+    ],
 ]
 
 QUEEN_O = [
-    [-20, -10, -10, -5, -5, -10, -10, -20,],
-    [-10, 0, 0, 0, 0, 0, 0, -10,],
-    [-10, 0, 5, 5, 5, 5, 0, -10,],
-    [-5, 0, 5, 5, 5, 5, 0, -5,],
-    [0, 0, 5, 5, 5, 5, 0, -5,],
-    [-10, 5, 5, 5, 5, 5, 0, -10,],
-    [-10, 0, 5, 0, 0, 0, 0, -10,],
-    [-20, -10, -10, -5, -5, -10, -10, -20,],
+    [
+        -20,
+        -10,
+        -10,
+        -5,
+        -5,
+        -10,
+        -10,
+        -20,
+    ],
+    [
+        -10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -10,
+    ],
+    [
+        -10,
+        0,
+        5,
+        5,
+        5,
+        5,
+        0,
+        -10,
+    ],
+    [
+        -5,
+        0,
+        5,
+        5,
+        5,
+        5,
+        0,
+        -5,
+    ],
+    [
+        0,
+        0,
+        5,
+        5,
+        5,
+        5,
+        0,
+        -5,
+    ],
+    [
+        -10,
+        5,
+        5,
+        5,
+        5,
+        5,
+        0,
+        -10,
+    ],
+    [
+        -10,
+        0,
+        5,
+        0,
+        0,
+        0,
+        0,
+        -10,
+    ],
+    [
+        -20,
+        -10,
+        -10,
+        -5,
+        -5,
+        -10,
+        -10,
+        -20,
+    ],
 ]
 
 KING_O = [
-    [0, 0, 0, 0, 0, 0, 0, 0,],
-    [0, 0, 0, 0, 0, 0, 0, 0,],
-    [0, 0, 0, 0, 0, 0, 0, 0,],
-    [0, 0, 0, 0, 0, 0, 0, 0,],
-    [0, 0, 0, 0, 0, 0, 0, 0,],
-    [0, 0, 0, 0, 0, 0, 0, 0,],
-    [0, 0, 0, 0, 0, 0, 0, 0,],
-    [0, 0, 0, 0, 0, 0, 0, 0,],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
 ]
 
 
@@ -559,6 +919,8 @@ KING = [
 #     chess.KING: 9000,
 # }
 
+MATE = 10000000 - 1
+
 
 def get_piece_value(piece, square, is_white):
     square = square if is_white else chess.square_mirror(square)
@@ -578,7 +940,7 @@ def evaluate_position_o(game_data):
     board = game_data.board
 
     if board.is_checkmate():
-        return -10000 if board.turn == chess.WHITE else +10000
+        return -MATE if board.turn == chess.WHITE else MATE
     if board.is_stalemate():
         return 0
 
@@ -598,12 +960,13 @@ def evaluate_position_o(game_data):
 
     return total
 
-def evaluate_position(game_data):
+
+def evaluate_position_i(game_data):
     board = game_data.board
 
     if board.is_checkmate():
         print("Checkmate detected")
-        return -9000 if board.turn == chess.WHITE else +9000
+        return -MATE if board.turn == chess.WHITE else MATE
     if board.is_stalemate():
         return 0
 
@@ -621,6 +984,48 @@ def evaluate_position(game_data):
         table = PIECE_POS_VALUES_MG[piece]
         pos_white = sum([table[i] for i in pieces_white])
         pos_black = sum([table[chess.square_mirror(i)] for i in pieces_black])
+        positional = pos_white - pos_black
+
+        # print(f"pos_white {pos_white}")
+        # print(f"pos_black {pos_black}")
+        # print(f"material {material}")
+        # print(f"positional {positional}")
+        total += material + positional
+
+    # print(f"total: {total}")
+    return total
+
+
+def evaluate_position(game_data):
+    board = game_data.board
+
+    if board.is_checkmate():
+        # print("Checkmate detected")
+        return -MATE if board.turn == chess.WHITE else MATE
+    if board.is_stalemate():
+        return 0
+
+    total = 0
+    for piece in PIECES:
+        # print(piece)
+
+        pieces_white = board.pieces(piece, chess.WHITE)
+        pieces_black = board.pieces(piece, chess.BLACK)
+
+        count_white = len(pieces_white)
+        count_black = len(pieces_black)
+        material = (count_white - count_black) * PIECE_VALUES[piece]
+
+        table = PIECE_POS_VALUES_MG[piece]
+
+        pos_white = 0
+        for i in pieces_white:
+            pos_white += table[i]
+
+        pos_black = 0
+        for i in pieces_black:
+            pos_black += table[chess.square_mirror(i)]
+
         positional = pos_white - pos_black
 
         # print(f"pos_white {pos_white}")
