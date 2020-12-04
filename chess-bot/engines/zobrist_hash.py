@@ -50,7 +50,6 @@ def get_all_piece_indexes(board):
 class ZobristHash:
     def __init__(self):
         self.zobrist_hash = 0
-        self.current_special_flags = 0
 
     def h(self):
         return self.zobrist_hash
@@ -62,26 +61,23 @@ class ZobristHash:
         for piece_index in get_all_piece_indexes(board):
             self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[piece_index]
 
+        # Hash in the special flags
         self.apply_special_flags(board)
 
         return self.zobrist_hash
 
-    def apply_special_flags(self, board):
-        self.current_special_flags = 0
+    def get_special_flags(self, board):
+        special_flags = 0
 
         # Hash in the castling flags [768 ... 771].
         if board.has_kingside_castling_rights(chess.WHITE):
-            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[768]
-            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[768]
+            special_flags ^= POLYGLOT_RANDOM_ARRAY[768]
         if board.has_queenside_castling_rights(chess.WHITE):
-            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[769]
-            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[769]
+            special_flags ^= POLYGLOT_RANDOM_ARRAY[769]
         if board.has_kingside_castling_rights(chess.BLACK):
-            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[770]
-            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[770]
+            special_flags ^= POLYGLOT_RANDOM_ARRAY[770]
         if board.has_queenside_castling_rights(chess.BLACK):
-            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[771]
-            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[771]
+            special_flags ^= POLYGLOT_RANDOM_ARRAY[771]
 
         # Hash in the en passant file [772 ... 779].
         if board.ep_square:
@@ -96,17 +92,21 @@ class ZobristHash:
 
             if ep_mask & board.pawns & board.occupied_co[board.turn]:
                 rand = POLYGLOT_RANDOM_ARRAY[772 + chess.square_file(board.ep_square)]
-                self.zobrist_hash ^= rand
-                self.current_special_flags ^= rand
+                special_flags ^= rand
 
         # Hash in turn [780]
         if board.turn == chess.WHITE:
-            self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[780]
-            self.current_special_flags ^= POLYGLOT_RANDOM_ARRAY[780]
+            special_flags ^= POLYGLOT_RANDOM_ARRAY[780]
+
+        return special_flags
+
+    def apply_special_flags(self, board):
+        self.special_flags = self.get_special_flags(board)
+        self.zobrist_hash ^= self.special_flags
 
     def remove_special_flags(self):
-        self.zobrist_hash ^= self.current_special_flags
-        self.current_special_flags = 0
+        self.zobrist_hash ^= self.special_flags
+        self.special_flags = 0
 
     def make_move(self, board, move):
         # Hash out the special flags

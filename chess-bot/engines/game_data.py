@@ -46,13 +46,15 @@ class GameData:
 
     def push_move(self, move):
         self._board.push(move)
-        self._zobrist_hash.make_move(self._board, move)
-        return self._zobrist_hash.h()
+        # self._zobrist_hash.make_move(self._board, move)
+        return self._zobrist_hash.from_board(self._board)
+        # return self._zobrist_hash.h()
 
     def pop_move(self):
-        move = self._board.pop()
-        self._zobrist_hash.undo_move(self._board, move)
-        return self._zobrist_hash.h()
+        self._board.pop()  # move =
+        # self._zobrist_hash.undo_move(self._board, move)
+        return self._zobrist_hash.from_board(self._board)
+        # return self._zobrist_hash.h()
 
 
 # fen = "r1bqkb1r/pppppppp/2n5/4P3/3P4/2N2N1P/PPP2nP1/R1BQKB1R w KQq - 0 7"

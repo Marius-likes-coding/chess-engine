@@ -5,8 +5,9 @@ import time
 
 from .minmax import min_max_first_iteration
 from .minmax_a_b_proning import a_b_min_max_first_iteration
-from .minmax_ab_tt import search_move
+from .minmax_ab_tt import search_move, tt_length
 from .game_data import GameData
+from .search_stats import SearchStats
 
 BOT_USERNAME = "Chestor2008"
 
@@ -123,10 +124,12 @@ def make_move(lc_connector, game_data, move):
 def calculate_next_move(game_data):
     start_time = time.time()
     # random_move = next(iter(game_data.board.legal_moves))
-    # best_move = search_move(game_data)
-    best_move = a_b_min_max_first_iteration(game_data, 4, True)
-    print(best_move.uci())
+    stats = SearchStats()
+    best_move = search_move(game_data, stats)
+    # best_move = a_b_min_max_first_iteration(game_data, 4, True)
     print("Move calculation time: %s seconds " % (time.time() - start_time))
+    print(stats)
+    print(f"TT size: {tt_length()}")
     return best_move
 
 

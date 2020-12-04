@@ -996,11 +996,13 @@ def evaluate_position_i(game_data):
     return total
 
 
-def evaluate_position(game_data):
+def evaluate_position(game_data, stats):
     board = game_data.board
 
+    stats.inc_nodes_evaluated()
     if board.is_checkmate():
         # print("Checkmate detected")
+        stats.inc_checkmates_detected()
         return -MATE if board.turn == chess.WHITE else MATE
     if board.is_stalemate():
         return 0
