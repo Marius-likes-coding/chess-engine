@@ -7,6 +7,7 @@ class GameData:
     def __init__(self, game_id):
         self._game_id = game_id
         self._color = None
+        self._sign = None
         self._board = chess.Board()
         self._zobrist_hash = ZobristHash()
         self._zobrist_hash.from_board(self._board)
@@ -40,6 +41,7 @@ class GameData:
     @color.setter
     def color(self, value):
         self._color = value
+        self._sign = 1 if self._color == chess.WHITE else -1
 
     def opponent_color(self):
         return not self._color
@@ -55,6 +57,9 @@ class GameData:
         # self._zobrist_hash.undo_move(self._board, move)
         return self._zobrist_hash.from_board(self._board)
         # return self._zobrist_hash.h()
+
+    def get_sign(self):
+        return self._sign
 
 
 # fen = "r1bqkb1r/pppppppp/2n5/4P3/3P4/2N2N1P/PPP2nP1/R1BQKB1R w KQq - 0 7"

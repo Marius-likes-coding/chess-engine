@@ -4,8 +4,10 @@ import chess
 import time
 
 from .minmax import min_max_first_iteration
-from .minmax_a_b_proning import a_b_min_max_first_iteration
-from .minmax_ab_tt import search_move, tt_length
+from .minmax_ab import a_b_min_max_first_iteration
+from .minmax_ab_tt import min_max_root, tt_length
+from .minmax_ab_tt_id import search_best_move, tt_length
+
 from .game_data import GameData
 from .search_stats import SearchStats
 
@@ -103,6 +105,10 @@ def update_game_data(game_data, event):
         color_last_move = UNICODE_PIECE_SYMBOLS[source_piece_uni]
         print(f"{color_last_move} moved: {move_string}")
 
+    remaining_time = event["wtime"] if game_data.color else event["btime"]
+    print(f"Remaining time: {remaining_time}")
+    game_data.remaining_time = int(remaining_time) / 1000
+
 
 def check_if_my_turn(game_data):
     if len(game_data.move_history) % 2 == 0:
@@ -121,13 +127,28 @@ def make_move(lc_connector, game_data, move):
     lc_connector.make_move(game_data.game_id, move.uci())
 
 
+AVG_MOVES_PER_GAME = 100
+
+
+def calculate_move_time(game_data):
+    moves_played = len(game_data.move_history)
+    remaining_moves = AVG_MOVES_PER_GAME - moves_played
+    remaining_plies = remaining_moves / 2
+    if moves_played >= AVG_MOVES_PER_GAME or game_data.remaining_time < 60:
+        remaining_plies = 10
+    return game_data.remaining_time / remaining_plies
+
+
 def calculate_next_move(game_data):
     start_time = time.time()
     # random_move = next(iter(game_data.board.legal_moves))
     stats = SearchStats()
-    best_move = search_move(game_data, stats)
+    # best_move = search_move(game_data, stats)
     # best_move = a_b_min_max_first_iteration(game_data, 4, True)
-    print("Move calculation time: %s seconds " % (time.time() - start_time))
+    move_time = calculate_move_time(game_data)
+    print(f"\n\nCalculating ... (given calculation time: {move_time})")
+    best_move = search_best_move(game_data, stats, move_time)
+    print(f"Move calculation time: {time.time() - start_time} seconds")
     print(stats)
     print(f"TT size: {tt_length()}")
     return best_move
@@ -169,7 +190,7 @@ def play(lc_connector, game_id, game_stream):
                 status = event["status"]
                 if status != "started":
                     print(f"Status: {status}")
-                    continue
+                    return
                 update_game_data(game_data, event)
                 is_my_turn = check_if_my_turn(game_data)
                 if is_my_turn:

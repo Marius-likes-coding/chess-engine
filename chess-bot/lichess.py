@@ -53,9 +53,6 @@ class LichessConnector:
 
     # Games
 
-    def stream_game(self, game_id):
-        return self.get(f"/api/bot/game/stream/{game_id}", stream=True)
-
     def make_move(self, game_id, move):
         return self.post(f"/api/bot/game/{game_id}/move/{move}").json()
 
@@ -64,4 +61,3 @@ class LichessConnector:
 
     def resign(self, game_id):
         return self.post(f"/api/bot/game/{game_id}/resign").json()
-

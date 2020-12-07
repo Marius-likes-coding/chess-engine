@@ -2,6 +2,10 @@ class SearchStats:
     def __init__(self):
         self.reset()
 
+    # Search
+    def inc_depth(self):
+        self._depth += 1
+
     # TT Hits
     def inc_hits_exact(self):
         self._hits_exact += 1
@@ -40,6 +44,9 @@ class SearchStats:
         self._nodes_saved += 1
 
     def reset(self):
+        # Search
+        self._depth = 1
+
         # Hits
         self._hits_exact = 0
         self._hits_alpha = 0
@@ -62,4 +69,4 @@ class SearchStats:
     def __str__(self):
         total_hits = self._hits_exact + self._hits_alpha + self._hits_beta
         total_cut_offs = self._alpha_cut_off + self._beta_cut_off + self._stored_cut_off
-        return f"Nodes calculated: {self._nodes_calculated} (evaluated: {self._nodes_evaluated}, saved:{self._nodes_saved}), Cut Offs: {total_cut_offs} (A:{self._alpha_cut_off}, B:{self._beta_cut_off}, S:{self._stored_cut_off}), Hits: {total_hits} (E:{self._hits_exact}, A:{self._hits_alpha}, B:{self._hits_beta}, Collisions:{self._inc_hash_collision}), Checkmates detected: {self._checkmates_detected}"
+        return f"Depth: {self._depth}, Nodes calculated: {self._nodes_calculated} (evaluated: {self._nodes_evaluated}, saved:{self._nodes_saved}), Cut Offs: {total_cut_offs} (A:{self._alpha_cut_off}, B:{self._beta_cut_off}, S:{self._stored_cut_off}), Hits: {total_hits} (E:{self._hits_exact}, A:{self._hits_alpha}, B:{self._hits_beta}, Collisions:{self._inc_hash_collision}), Checkmates detected: {self._checkmates_detected}"

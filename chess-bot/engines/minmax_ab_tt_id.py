@@ -1,10 +1,13 @@
 import chess
-from .evaluate import evaluate_position
+from time import time
+
+from .evaluate import evaluate_position, MATE
 from .game_data import GameData
 from .transposition_table import TranspositionTable
 
 INF = 10000000
-DEFAULT_DEPTH = 4
+MIN_DEPTH = 2
+MAX_DEPTH = 15
 
 tt = TranspositionTable()
 
@@ -13,7 +16,32 @@ def tt_length():
     return len(tt)
 
 
-def min_max_root(game_data, stats, depth=DEFAULT_DEPTH):
+def search_best_move(game_data, stats, max_time=12):
+    deadline = time() + max_time
+
+    best_move = None
+    current_depth = MIN_DEPTH
+    while time() <= deadline and current_depth <= MAX_DEPTH:
+
+        move, value = min_max_root(game_data, stats, current_depth, deadline)
+
+        if move is None:
+            print(f"Search: cancel depth: {current_depth}")
+            break
+
+        best_move = move
+        print(f"Search: depth {current_depth}, best move {move.uci()}")
+
+        if value == game_data.get_sign() * MATE:
+            break
+
+        current_depth += 1
+        stats.inc_depth()
+
+    return best_move
+
+
+def min_max_root(game_data, stats, depth, deadline):
     best_move = None
     best_value = -INF
     alpha = -INF
@@ -26,13 +54,16 @@ def min_max_root(game_data, stats, depth=DEFAULT_DEPTH):
         game_data.pop_move()
         stats.inc_nodes_calculated()
 
+        if time() > deadline and depth > MIN_DEPTH:
+            return None, None
+
         if value > best_value:
             best_move = move
             best_value = value
 
         alpha = max(alpha, value)
 
-    return best_move
+    return best_move, best_value
 
 
 def min_max(game_data, stats, depth, alpha, beta, is_maximizing_player):
@@ -58,8 +89,7 @@ def min_max(game_data, stats, depth, alpha, beta, is_maximizing_player):
     legal_moves = list(game_data.board.legal_moves)
 
     if depth == 0 or len(legal_moves) == 0:
-        sign = 1 if game_data.color == chess.WHITE else -1
-        return sign * evaluate_position(game_data, stats)
+        return game_data.get_sign() * evaluate_position(game_data, stats)
 
     value = None
     if is_maximizing_player:
