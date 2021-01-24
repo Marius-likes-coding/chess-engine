@@ -50,11 +50,12 @@ def get_all_piece_indexes(board):
 class ZobristHash:
     def __init__(self):
         self.zobrist_hash = 0
+        self.castling_rights = [True, True, True, True]
 
     def h(self):
         return self.zobrist_hash
 
-    def from_board(self, board):
+    def calculate_from_scratch(self, board):
         self.zobrist_hash = 0
 
         # Hash in the pieces [0 ... 767].
@@ -62,21 +63,25 @@ class ZobristHash:
             self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[piece_index]
 
         # Hash in the special flags
-        self.apply_special_flags(board)
+        self.castling_rights = self.get_current_castling_rights(board)
+        self.apply_special_flags(board, self.castling_rights)
 
         return self.zobrist_hash
 
-    def get_special_flags(self, board):
+    def from_board(self, board):
+        return self.calculate_from_scratch(board)
+
+    def get_special_flags(self, board, castling_rights):
         special_flags = 0
 
         # Hash in the castling flags [768 ... 771].
-        if board.has_kingside_castling_rights(chess.WHITE):
+        if castling_rights[0]:  # white_king
             special_flags ^= POLYGLOT_RANDOM_ARRAY[768]
-        if board.has_queenside_castling_rights(chess.WHITE):
+        if castling_rights[1]:  # white_queen
             special_flags ^= POLYGLOT_RANDOM_ARRAY[769]
-        if board.has_kingside_castling_rights(chess.BLACK):
+        if castling_rights[2]:  # black_king
             special_flags ^= POLYGLOT_RANDOM_ARRAY[770]
-        if board.has_queenside_castling_rights(chess.BLACK):
+        if castling_rights[3]:  # black_queen
             special_flags ^= POLYGLOT_RANDOM_ARRAY[771]
 
         # Hash in the en passant file [772 ... 779].
@@ -100,15 +105,36 @@ class ZobristHash:
 
         return special_flags
 
-    def apply_special_flags(self, board):
-        self.special_flags = self.get_special_flags(board)
+    def apply_special_flags(self, board, castling_rights):
+        self.special_flags = self.get_special_flags(board, castling_rights)
         self.zobrist_hash ^= self.special_flags
 
     def remove_special_flags(self):
         self.zobrist_hash ^= self.special_flags
         self.special_flags = 0
 
-    def make_move(self, board, move):
+    def get_current_castling_rights(self, board):
+        white_king = board.has_kingside_castling_rights(chess.WHITE)
+        white_queen = board.has_queenside_castling_rights(chess.WHITE)
+        black_king = board.has_kingside_castling_rights(chess.BLACK)
+        black_queen = board.has_queenside_castling_rights(chess.BLACK)
+        return [white_king, white_queen, black_king, black_queen]
+
+    def castling_rights_arrays_different(self, other):
+        return (
+            other[0] != self.castling_rights[0]
+            or other[1] != self.castling_rights[1]
+            or other[2] != self.castling_rights[2]
+            or other[3] != self.castling_rights[3]
+        )
+
+    def make_move(self, board, move, dropped_piece=None):
+
+        current_castling_rights = self.get_current_castling_rights(board)
+
+        if self.castling_rights_arrays_different(current_castling_rights):
+            return self.calculate_from_scratch(board)
+
         # Hash out the special flags
         self.remove_special_flags()
 
@@ -124,14 +150,13 @@ class ZobristHash:
         self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[from_index]
 
         # If a piece was dropped, hash it out of the TO square
-        if move.drop is not None:
-            drop_piece = move.drop
+        if dropped_piece is not None:
+            drop_piece = dropped_piece
             drop_color = not from_color
             drop_index = get_piece_index(drop_piece, drop_color, move.to_square)
 
             self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[drop_index]
 
-        # if a promotion occurs the piece type changes:
         to_piece = board.piece_type_at(move.to_square)
         to_index = get_piece_index(to_piece, from_color, move.to_square)
 
@@ -139,10 +164,16 @@ class ZobristHash:
         self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[to_index]
 
         # Hash in the special flags
-        self.apply_special_flags(board)
+        self.apply_special_flags(board, self.castling_rights)
         return self.zobrist_hash
 
     def undo_move(self, board, move):
+
+        current_castling_rights = self.get_current_castling_rights(board)
+
+        if self.castling_rights_arrays_different(current_castling_rights):
+            return self.calculate_from_scratch(board)
+
         # Hash out the special flags
         self.remove_special_flags()
 
@@ -160,7 +191,6 @@ class ZobristHash:
         # Hash out the piece at its TO square
         self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[to_index]
 
-        # if a promotion occurs the piece type changes:
         from_piece = board.piece_type_at(move.from_square)
         # print(f"from_piece: {from_piece}")
         # print(f"from_color: {to_color}")
@@ -171,8 +201,8 @@ class ZobristHash:
         self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[from_index]
 
         # If a piece was dropped, hash it in the TO square
-        if move.drop is not None:
-            drop_piece = move.drop
+        drop_piece = board.piece_type_at(move.to_square)
+        if drop_piece is not None:
             drop_color = not to_color
             # print(f"drop_piece: {drop_piece}")
             # print(f"drop_color: {drop_color}")
@@ -182,5 +212,5 @@ class ZobristHash:
             self.zobrist_hash ^= POLYGLOT_RANDOM_ARRAY[drop_index]
 
         # Hash in the special flags
-        self.apply_special_flags(board)
+        self.apply_special_flags(board, self.castling_rights)
         return self.zobrist_hash

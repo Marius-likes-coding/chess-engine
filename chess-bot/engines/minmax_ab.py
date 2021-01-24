@@ -12,9 +12,9 @@ def a_b_min_max_first_iteration(game_data, depth, is_maximizing_player):
     beta = INF
 
     for move in game_data.board.legal_moves:
-        game_data.board.push(move)
+        game_data.push_move(move)
         value = min_max(game_data, depth - 1, alpha, beta, False)
-        game_data.board.pop()
+        game_data.pop_move()
 
         if value > best_value:
             best_move = move
@@ -35,9 +35,9 @@ def min_max(game_data, depth, alpha, beta, is_maximizing_player):
     elif is_maximizing_player:
         value = -1000000
         for move in legal_moves:
-            game_data.board.push(move)
+            game_data.push_move(move)
             value = max(value, min_max(game_data, depth - 1, alpha, beta, False))
-            game_data.board.pop()
+            game_data.pop_move()
 
             alpha = max(alpha, value)
             if alpha >= beta:
@@ -48,9 +48,9 @@ def min_max(game_data, depth, alpha, beta, is_maximizing_player):
     else:
         value = +1000000
         for move in legal_moves:
-            game_data.board.push(move)
+            game_data.push_move(move)
             value = min(value, min_max(game_data, depth - 1, alpha, beta, True))
-            game_data.board.pop()
+            game_data.pop_move()
 
             beta = min(beta, value)
             if alpha >= beta:

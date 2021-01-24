@@ -2,6 +2,8 @@ import json
 import random
 import chess
 import time
+import cProfile
+import pstats
 
 from .minmax import min_max_first_iteration
 from .minmax_ab import a_b_min_max_first_iteration
@@ -71,7 +73,7 @@ def color_name(color):
 
 def parse_and_save_move(game_data, raw_move):
     move = chess.Move.from_uci(raw_move)
-    game_data.board.push(move)
+    game_data.push_move(move)
     game_data.move_history.append(raw_move)
     return move
 
@@ -98,7 +100,7 @@ def update_game_data(game_data, event):
         move = chess.Move.from_uci(moves[-1])
         move_string, source_piece_uni = move_to_unicode(move, moves[-1], game_data)
 
-        game_data.board.push(move)
+        game_data.push_move(move)
         game_data.move_history.append(moves[-1])
 
         # announce last move
@@ -147,7 +149,18 @@ def calculate_next_move(game_data):
     # best_move = a_b_min_max_first_iteration(game_data, 4, True)
     move_time = calculate_move_time(game_data)
     print(f"\n\nCalculating ... (given calculation time: {move_time})")
+
+    # pr = cProfile.Profile()
+    # pr.enable()
+
     best_move = search_best_move(game_data, stats, move_time)
+
+    # pr.disable()
+    # with open("/home/sideproject/dev/chess-bot/profile.txt", "w") as stream:
+    #     stats = pstats.Stats(pr, stream=stream).sort_stats(pstats.SortKey.CUMULATIVE)
+    #     stats.print_stats()
+
+    # x = input()
     print(f"Move calculation time: {time.time() - start_time} seconds")
     print(stats)
     print(f"TT size: {tt_length()}")

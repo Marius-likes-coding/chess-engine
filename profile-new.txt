@@ -1,0 +1,128 @@
+         34239140 function calls (34182977 primitive calls) in 12.000 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   12.000   12.000 /home/sideproject/dev/chess-bot/chess-bot/engines/minmax_ab_tt_id.py:55(search_best_move)
+        3    0.000    0.000   12.000    4.000 /home/sideproject/dev/chess-bot/chess-bot/engines/minmax_ab_tt_id.py:86(min_max_root)
+ 56204/41    0.526    0.000   11.998    0.293 /home/sideproject/dev/chess-bot/chess-bot/engines/minmax_ab_tt_id.py:128(min_max)
+  1577881    0.644    0.000    5.076    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3452(generate_legal_moves)
+    48105    0.939    0.000    3.716    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/evaluate.py:999(evaluate_position)
+  1582784    1.326    0.000    3.234    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1607(generate_pseudo_legal_moves)
+    56204    0.070    0.000    1.778    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/game_data.py:51(push_move)
+    56204    0.049    0.000    1.159    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/game_data.py:70(pop_move)
+    56204    0.149    0.000    0.977    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:170(undo_move)
+    56204    0.127    0.000    0.899    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:131(make_move)
+  3867776    0.694    0.000    0.862    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:233(scan_reversed)
+  1481248    0.512    0.000    0.827    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3414(_is_safe)
+    56204    0.290    0.000    0.796    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:2112(push)
+  2633623    0.619    0.000    0.744    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:224(scan_forward)
+    11892    0.052    0.000    0.708    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:58(calculate_from_scratch)
+    48104    0.056    0.000    0.663    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1903(is_stalemate)
+   719952    0.301    0.000    0.659    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:622(pieces)
+   590109    0.122    0.000    0.610    0.000 {built-in method builtins.len}
+    11892    0.220    0.000    0.589    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:30(get_all_piece_indexes)
+   124300    0.142    0.000    0.573    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:116(get_current_castling_rights)
+   577248    0.119    0.000    0.489    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3812(__len__)
+    50600    0.028    0.000    0.434    0.000 {built-in method builtins.any}
+    55310    0.209    0.000    0.409    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3488(generate_castling_moves)
+   238079    0.074    0.000    0.383    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:728(attackers_mask)
+   577248    0.166    0.000    0.370    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:243(popcount)
+  4918392    0.326    0.000    0.326    0.000 {method 'bit_length' of 'int' objects}
+   488538    0.324    0.000    0.324    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:680(attacks_mask)
+  1537452    0.324    0.000    0.324    0.000 <string>:2(__init__)
+   241814    0.313    0.000    0.313    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:710(_attackers_mask)
+    96209    0.035    0.000    0.306    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1706(is_check)
+    96209    0.053    0.000    0.271    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1694(checkers_mask)
+   248600    0.238    0.000    0.270    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3188(has_kingside_castling_rights)
+    48105    0.015    0.000    0.200    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1896(is_checkmate)
+    56204    0.050    0.000    0.193    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:2106(_board_state)
+   719952    0.189    0.000    0.189    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:606(pieces_mask)
+  1440768    0.177    0.000    0.177    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3071(is_en_passant)
+   719952    0.168    0.000    0.168    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3789(__init__)
+   112408    0.053    0.000    0.164    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:108(apply_special_flags)
+   248600    0.134    0.000    0.161    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3209(has_queenside_castling_rights)
+   102630    0.141    0.000    0.161    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3395(_slider_blockers)
+    56204    0.051    0.000    0.133    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:2233(pop)
+   112408    0.097    0.000    0.126    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:806(_remove_piece_at)
+   494831    0.089    0.000    0.123    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:230(msb)
+   476106    0.121    0.000    0.121    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:640(piece_type_at)
+   112408    0.099    0.000    0.111    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:74(get_special_flags)
+   577248    0.103    0.000    0.103    0.000 {built-in method builtins.bin}
+   577248    0.101    0.000    0.101    0.000 {method 'count' of 'str' objects}
+   586728    0.099    0.000    0.099    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:24(get_piece_index)
+   719952    0.092    0.000    0.092    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3806(__iter__)
+   766914    0.081    0.000    0.081    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:168(square_mirror)
+    39240    0.013    0.000    0.081    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:731(is_attacked_by)
+   199668    0.081    0.000    0.081    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:399(between)
+    56204    0.046    0.000    0.080    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:842(_set_piece_at)
+    56204    0.065    0.000    0.077    0.000 /usr/lib/python3.8/typing.py:868(__new__)
+   597293    0.076    0.000    0.076    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3127(clean_castling_rights)
+    56204    0.071    0.000    0.071    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1350(restore)
+    96222    0.043    0.000    0.068    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:669(king)
+    56204    0.066    0.000    0.066    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1330(__init__)
+    40480    0.042    0.000    0.057    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3108(is_castling)
+    57444    0.034    0.000    0.051    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3518(_from_chess960)
+   404854    0.047    0.000    0.047    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:158(square_rank)
+   112408    0.043    0.000    0.043    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:123(castling_rights_arrays_different)
+   100516    0.038    0.000    0.038    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:112(remove_special_flags)
+    56203    0.024    0.000    0.037    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/transposition_table.py:66(get_node)
+   505552    0.036    0.000    0.036    0.000 {method 'append' of 'list' objects}
+    54525    0.024    0.000    0.035    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1496(legal_moves)
+    56204    0.034    0.000    0.034    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3083(is_zeroing)
+   100516    0.026    0.000    0.026    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:659(color_at)
+   104430    0.023    0.000    0.023    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:499(__bool__)
+   204386    0.019    0.000    0.019    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1789(is_variant_end)
+    54525    0.016    0.000    0.016    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3698(__iter__)
+     2699    0.003    0.000    0.015    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3427(_generate_evasions)
+    56204    0.015    0.000    0.015    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3533(_to_chess960)
+    56199    0.014    0.000    0.014    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:40(inc_nodes_calculated)
+    13220    0.008    0.000    0.014    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/minmax_ab_tt_id.py:19(update_best_moves)
+    48105    0.013    0.000    0.013    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:43(inc_nodes_evaluated)
+    59065    0.013    0.000    0.013    0.000 {built-in method __new__ of type object at 0x8d0ac0}
+     9486    0.011    0.000    0.011    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:1674(generate_pseudo_legal_ep)
+    54525    0.011    0.000    0.011    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3688(__init__)
+    56248    0.011    0.000    0.011    0.000 {built-in method time.time}
+    56203    0.011    0.000    0.011    0.000 {method 'get' of 'dict' objects}
+   102630    0.011    0.000    0.011    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/game_data.py:17(board)
+   112417    0.011    0.000    0.011    0.000 {method 'pop' of 'list' objects}
+     2495    0.001    0.000    0.010    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3485(_attacked_for_king)
+    80973    0.010    0.000    0.010    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:154(square_file)
+    28675    0.010    0.000    0.010    0.000 {built-in method builtins.min}
+    29447    0.009    0.000    0.009    0.000 {built-in method builtins.max}
+     6412    0.006    0.000    0.008    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/transposition_table.py:49(insert_node)
+     6230    0.002    0.000    0.008    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3486(<genexpr>)
+    56203    0.008    0.000    0.008    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/game_data.py:27(zobrist_hash)
+    56204    0.007    0.000    0.007    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/minmax_ab_tt_id.py:28(is_still_pv_line)
+    48107    0.006    0.000    0.006    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/game_data.py:93(get_sign)
+    56203    0.006    0.000    0.006    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/zobrist_hash.py:55(h)
+    40493    0.005    0.000    0.005    0.000 {built-in method builtins.abs}
+    13440    0.005    0.000    0.005    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:299(shift_left)
+    13440    0.005    0.000    0.005    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:293(shift_right)
+     8002    0.002    0.000    0.002    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:287(shift_up)
+    13220    0.002    0.000    0.002    0.000 {method 'clear' of 'list' objects}
+     2861    0.001    0.000    0.002    0.000 <string>:1(__new__)
+     6412    0.002    0.000    0.002    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/transposition_table.py:8(kind_to_int)
+    13220    0.002    0.000    0.002    0.000 {method 'extend' of 'list' objects}
+     6412    0.001    0.000    0.001    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:46(inc_nodes_saved)
+     5438    0.001    0.000    0.001    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:281(shift_down)
+     5299    0.001    0.000    0.001    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:396(ray)
+     2764    0.001    0.000    0.001    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:26(inc_alpha_cut_off)
+     2861    0.001    0.000    0.001    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/transposition_table.py:17(int_to_kind)
+     2092    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:29(inc_beta_cut_off)
+     2914    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:2109(_push_capture)
+     1414    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:16(inc_hits_alpha)
+     1574    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:32(inc_stored_cut_off)
+      510    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:19(inc_hits_beta)
+       12    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/minmax_ab_tt_id.py:39(swap_move_to_front)
+      122    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:478(uci)
+      107    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:13(inc_hits_exact)
+        3    0.000    0.000    0.000    0.000 {built-in method builtins.print}
+       13    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:750(pin_mask)
+       13    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/envir/lib/python3.8/site-packages/chess/__init__.py:3368(_ep_skewered)
+        9    0.000    0.000    0.000    0.000 {method 'insert' of 'list' objects}
+        2    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:9(set_depth)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        1    0.000    0.000    0.000    0.000 /home/sideproject/dev/chess-bot/chess-bot/engines/search_stats.py:36(inc_checkmates_detected)
+
+

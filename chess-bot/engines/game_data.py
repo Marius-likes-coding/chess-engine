@@ -12,6 +12,7 @@ class GameData:
         self._zobrist_hash = ZobristHash()
         self._zobrist_hash.from_board(self._board)
         self._move_history = []
+        # self._hash_stack = [self._zobrist_hash.h()]
 
     @property
     def board(self):
@@ -21,6 +22,7 @@ class GameData:
     def board(self, board):
         self._board = board
         self._zobrist_hash.from_board(self._board)
+        # self._hash_stack = [self._zobrist_hash.h()]
 
     @property
     def zobrist_hash(self):
@@ -47,77 +49,46 @@ class GameData:
         return not self._color
 
     def push_move(self, move):
+        # fen = self._board.fen()
+        dropped_piece = self._board.piece_type_at(move.to_square)
         self._board.push(move)
-        # self._zobrist_hash.make_move(self._board, move)
-        return self._zobrist_hash.from_board(self._board)
-        # return self._zobrist_hash.h()
+        _hash = self._zobrist_hash.make_move(self._board, move, dropped_piece)
+        # self._hash_stack.append(_hash)
+        # _hash_fresh = ZobristHash().from_board(self._board)
+
+        # if _hash != _hash_fresh:
+        #     print("Hash problem:DO")
+        #     print(f"Fen: {fen}")
+        #     print(f"Uci: {move.uci()}")
+        #     print(f"_hash: {_hash}")
+        #     print(f"_hash_fresh: {_hash_fresh}")
+        # else:
+        #     print("No problem !")
+
+        return _hash
 
     def pop_move(self):
-        self._board.pop()  # move =
-        # self._zobrist_hash.undo_move(self._board, move)
-        return self._zobrist_hash.from_board(self._board)
-        # return self._zobrist_hash.h()
+
+        move = self._board.pop()  # move =
+        _hash = self._zobrist_hash.undo_move(self._board, move)
+
+        # _hash_from_stack = self._hash_stack[-2]
+        # _hash_fresh = ZobristHash().from_board(self._board)
+
+        # if _hash_from_stack != _hash_fresh or _hash != _hash_fresh:
+        #     print("Hash problem:UNDO")
+        #     print(f"Fen: {self._board.fen()}")
+        #     print(f"Uci: {move.uci()}")
+        #     print(f"stack: {self._hash_stack}")
+        #     print(f"_hash_from_stack: {_hash_from_stack}")
+        #     print(f"_hash: {_hash}")
+        #     print(f"_hash_fresh: {_hash_fresh}")
+        # else:
+        #     print("No problem !")
+
+        # self._hash_stack.pop()
+
+        return _hash
 
     def get_sign(self):
         return self._sign
-
-
-# fen = "r1bqkb1r/pppppppp/2n5/4P3/3P4/2N2N1P/PPP2nP1/R1BQKB1R w KQq - 0 7"
-
-# game_data_ = GameData(1)
-# game_data_.board = chess.Board(fen)
-
-# print("\n\ninitial pos:")
-# print(game_data_.zobrist_hash.h())
-# move = chess.Move.from_uci("a2a3")
-# print(move.from_square)
-# print(move.to_square)
-# game_data_.push_move(move)
-# print("move done:")
-# print(game_data_.zobrist_hash.h())
-# game_data_.pop_move()
-# print("move undone:")
-# print(game_data_.zobrist_hash.h())
-
-# print("\n\ninitial pos:")
-# print(game_data_.zobrist_hash.h())
-# move = chess.Move.from_uci("e1f2")
-# print(move.from_square)
-# print(move.to_square)
-# game_data_.push_move(move)
-# print("move done:")
-# print(game_data_.zobrist_hash.h())
-# game_data_.pop_move()
-# print("move undone:")
-# print(game_data_.zobrist_hash.h())
-
-# fen2 = "rnb2bnr/pppPkppp/4p3/2q5/3P4/8/PPP2PPP/RNBQKBNR w KQ - 1 6"
-
-# game_data_.board = chess.Board(fen2)
-# print("\n\ninitial pos:")
-# print(game_data_.zobrist_hash.h())
-
-# move = chess.Move.from_uci("d7d8q")
-# print(move.promotion)
-# print(move.from_square)
-# print(move.to_square)
-
-# game_data_.push_move(move)
-# print(game_data_.board.fen())
-# print("move done:")
-# print(game_data_.zobrist_hash.h())
-
-# h = ZobristHash()
-# h.from_board(game_data_.board)
-# print(h.h())
-
-# game_data_.pop_move()
-# print("move undone:")
-# print(game_data_.zobrist_hash.h())
-
-
-# game_data_.board = chess.Board(
-#     "rnbQ1bnr/ppp1kppp/4p3/2q5/3P4/8/PPP2PPP/RNBQKBNR b KQ - 0 6"
-# )
-# print("\n\ninitial pos:")
-# print(game_data_.zobrist_hash.h())

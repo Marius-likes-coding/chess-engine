@@ -6,6 +6,9 @@ class SearchStats:
     def inc_depth(self):
         self._depth += 1
 
+    def set_depth(self, depth):
+        self._depth = depth
+
     # TT Hits
     def inc_hits_exact(self):
         self._hits_exact += 1
@@ -45,7 +48,7 @@ class SearchStats:
 
     def reset(self):
         # Search
-        self._depth = 1
+        self._depth = 0
 
         # Hits
         self._hits_exact = 0
